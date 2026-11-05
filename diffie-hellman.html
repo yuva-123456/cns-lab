@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Diffie-Hellman Key Exchange</title>
+</head>
+<body>
+    <h2>Diffie-Hellman Key Exchange</h2>
+
+    <label>Prime number (p): </label>
+    <input type="number" id="p" value="23"><br><br>
+
+    <label>Primitive root (g): </label>
+    <input type="number" id="g" value="5"><br><br>
+
+    <label>Alice's private key (a): </label>
+    <input type="number" id="a" value="6"><br><br>
+
+    <label>Bob's private key (b): </label>
+    <input type="number" id="b" value="15"><br><br>
+
+    <button onclick="calculate()">Generate Shared Key</button>
+    <pre id="output"></pre>
+
+    <script>
+        function powerMod(base, exponent, modulus) {
+            let result = 1;
+            base %= modulus;
+
+            while (exponent > 0) {
+                if (exponent % 2 === 1) {
+                    result = (result * base) % modulus;
+                }
+
+                base = (base * base) % modulus;
+                exponent = Math.floor(exponent / 2);
+            }
+
+            return result;
+        }
+
+        function calculate() {
+            const p = Number(document.getElementById("p").value);
+            const g = Number(document.getElementById("g").value);
+            const a = Number(document.getElementById("a").value);
+            const b = Number(document.getElementById("b").value);
+
+            if (![p, g, a, b].every(Number.isSafeInteger) ||
+                p < 2 || g < 1 || g >= p || a < 1 || b < 1) {
+                document.getElementById("output").textContent =
+                    "Enter valid positive integers.";
+                return;
+            }
+
+            const A = powerMod(g, a, p);
+            const B = powerMod(g, b, p);
+
+            const secretA = powerMod(B, a, p);
+            const secretB = powerMod(A, b, p);
+
+            document.getElementById("output").textContent =
+                "Alice's Public Key: " + A +
+                "\nBob's Public Key: " + B +
+                "\nAlice's Shared Secret: " + secretA +
+                "\nBob's Shared Secret: " + secretB +
+                "\nKeys Match: " + (secretA === secretB);
+        }
+    </script>
+</body>
+</html>
